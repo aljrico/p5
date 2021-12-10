@@ -1,0 +1,52 @@
+---
+title: "shiny"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{shiny}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(p5)
+library(shiny)
+
+label_dimensions = list(width = 380, height = 532)
+
+ui <- fluidPage(
+  h1("Title"),
+  p5::p5Output("canvas")
+)
+
+server <- function(input, output, session){
+  output$canvas <- p5::renderP5({
+    
+    setup_ <- setup() %>%
+      createCanvas(label_dimensions$width, label_dimensions$height) %>%
+      background("#F4F8FC") |> 
+      js("  // Here, we use a callback to display the image after loading
+  loadImage('http://jeroen.github.io/images/tiger.svg', img => {
+    image(img, 0, 0);
+  });")
+draw_ <- draw() %>%
+  js("
+      if (mouseIsPressed) {
+        fill(0);
+      } else {
+        fill(255);
+      }
+  ") %>%
+  ellipse(~mouseX, ~mouseY, 80, 80)
+sketch(setup = setup_, draw = draw_)
+  })
+}
+
+shiny::shinyApp(ui, server)
+```
