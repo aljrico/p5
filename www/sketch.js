@@ -13,7 +13,7 @@ let imgY = 30;
 let diff = 0;
 let startImgX = 0;
 let startImgY = 0;
-let backgroundColour = "#FAFAFA";
+let backgroundColour = '#FAFAFA';
 const canvasWidth = 1181;
 const canvasHeight = 1653;
 let reductionRatio = 0.35;
@@ -21,30 +21,43 @@ let imageWidth = null;
 let imageHeight = null;
 let imagePath = null;
 
-Shiny.addCustomMessageHandler('change-color', function(msg) {
+Shiny.addCustomMessageHandler('change-color', function (msg) {
   backgroundColour = msg.colour;
 });
 
-Shiny.addCustomMessageHandler('change-logo', function(msg) {
+Shiny.addCustomMessageHandler('change-logo', function (msg) {
   imagePath = msg.filepath;
   img = loadImage(imagePath);
 });
 
-
-Shiny.addCustomMessageHandler('save', function(msg) {
+Shiny.addCustomMessageHandler('save', function (msg) {
   myCanvas.hide();
-  Shiny.setInputValue("image_loading", makeid(16));
-  loadImage(imagePath, img => {
-    /* img.remove();
-    resizeCanvas(canvasWidth, canvasHeight);
+  Shiny.setInputValue('image_loading', makeid(16));
+  loadImage(imagePath, (img) => {
+    //img.remove();
+    //resizeCanvas(canvasWidth, canvasHeight);
+    /* myCanvas = createCanvas(canvasWidth, canvasHeight, SVG);
+    myCanvas.id(idCanvas);
+    background(backgroundColour);
     const scaledX = imgX / reductionRatio;
     const scaledY = imgY / reductionRatio;
-    image(img, scaledX, scaledX); */
+    image(img, scaledX, scaledX);
+    */
     //const dataURL = myCanvas.elt.toDataURL('image/svg+xml');
     const dataURL = myCanvas.elt.toDataURL();
+    console.log({ dataURL });
+
+    const _img = document.body.appendChild('img');
+    _img.setAttribute('src', dataURL);
     //const imageBase64String = dataURL.replace(/^data:image\/svg\+xml;charset\=utf-8,/, "");
-    const imageBase64String = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-    Shiny.setInputValue("imageBase64String", {base64: imageBase64String, url: dataURL});
+    const imageBase64String = dataURL.replace(
+      /^data:image\/(png|jpg);base64,/,
+      ''
+    );
+    Shiny.setInputValue('imageBase64String', {
+      base64: imageBase64String,
+      url: dataURL
+    });
   });
 });
 
@@ -54,7 +67,7 @@ function mousePressed() {
 }
 
 function mouseDragged() {
-	diff = startImgX - mouseX;
+  diff = startImgX - mouseX;
   imgX = imgX - diff;
   startImgX = mouseX;
 
@@ -64,22 +77,25 @@ function mouseDragged() {
 }
 
 function setup() {
-  myCanvas = createCanvas(canvasWidth * reductionRatio, canvasHeight * reductionRatio);
+  myCanvas = createCanvas(
+    canvasWidth * reductionRatio,
+    canvasHeight * reductionRatio,
+    SVG
+  );
   myCanvas.id(idCanvas);
 }
 
 function draw() {
-  // myCanvas.drawingContext.__clearCanvas();
+  // clear();
+  myCanvas.drawingContext.__clearCanvas();
   background(backgroundColour);
-  if(img){
+  if (img) {
     image(img, imgX, imgY);
-/*
-    if(!imageWidth & img.width != 1){
+    if (!imageWidth & (img.width != 1)) {
       imageWidth = img.width;
       imageHeight = img.height;
       img.resize(img.width * reductionRatio, img.height * reductionRatio);
     }
-    */
   }
 }
 
@@ -90,11 +106,12 @@ function keyTyped() {
 }
 
 function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
+  var result = '';
+  var characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
